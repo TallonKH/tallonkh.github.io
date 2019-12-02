@@ -1,0 +1,12 @@
+Eventually
++ Add recenter button
++ Add cutting of line segments by clicking on them
++ Add settings panels for individual nodes
++ Add separate "part" sheets
+
+Immediately
+? nothing
+
+Done
++ Rotate node state on click (remember to not allow multiple roots)
++ Add z-depth/click translucency

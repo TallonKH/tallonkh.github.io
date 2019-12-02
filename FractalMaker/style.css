@@ -1,0 +1,22 @@
+body {
+    padding: 0px;
+    margin: 0px;
+}
+
+.gutter.gutter-horizontal {
+    cursor: ew-resize;
+}
+
+.flexplit {
+    display: flex;
+    background-color: #202020;
+}
+
+#mainContainer {
+    height: 100%;
+}
+
+#mainContainer>.half {
+    /* background-color: #ebebeb; */
+    background-color: #1a1a1a;
+}
