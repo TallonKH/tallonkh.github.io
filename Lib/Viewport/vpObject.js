@@ -1,16 +1,20 @@
 var idCounter = 0;
 class VPObject {
     constructor(vp, {
+        position = new NPoint(),
         drawable = true,
         mouseListening = false,
         zOrder = 0
     } = {}) {
         this.vp = vp;
         this.uuid = idCounter++;
-        this.zOrder = zOrder;
-        this.mouseListening = mouseListening;
+        
+        this.position = position;
         this.drawable = drawable;
-        this.position = new NPoint(0, 0);
+        this.mouseListening = mouseListening;
+        this.zOrder = zOrder;
+        
+        this.zSubOrder = 0;
         this.mouseOverlapping = false;
         this.held = false;
         this.grabbed = false;
@@ -65,12 +69,11 @@ class VPObject {
     }
 
     fillCircle(ctx) {
-        const self = this;
-        const adPos = self.vp.canvasToViewSpace(self.position);
+        const adPos = this.vp.canvasToViewSpace(this.position);
         ctx.beginPath();
         ctx.ellipse(
             adPos.x, adPos.y,
-            self.size * self.vp.zoomFactor, self.size * self.vp.zoomFactor,
+            this.size * this.vp.zoomFactor, this.size * this.vp.zoomFactor,
             0,
             0, 2 * Math.PI);
         ctx.fill();
