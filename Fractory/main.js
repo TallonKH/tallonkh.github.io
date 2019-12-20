@@ -21,7 +21,12 @@ $(function () {
 
 function setupElements() {
     helpButton.onclick = e => window.open("./Tutorial/Tutorial.html");
-    photoButton.onclick = e => saveCanvas(viewer.canvas, "Fractal");
+    photoButton.onclick = function(){
+        const name = prompt("Screenshot taken. What would you like to name it?")
+        if(name){
+            saveCanvas(viewer.canvas, name);
+        }
+    }
     trashButton.onclick = e => editor.clearShape();
     scrambleButton.onclick = scrambleColors;
 
