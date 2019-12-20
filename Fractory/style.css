@@ -1,0 +1,139 @@
+body {
+    padding: 0px;
+    margin: 0px;
+}
+
+.gutter.gutter-horizontal {
+    cursor: ew-resize;
+}
+
+.flexplit {
+    display: flex;
+    background-color: #202020;
+}
+
+.material-icons {
+    user-select: none;
+}
+
+#mainContainer {
+    height: 100%;
+}
+
+#toolbarContainer {
+    position: fixed;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    opacity: 0.5;
+    border-bottom-right-radius: 20px;
+    background: #555;
+    transition:
+        background-color 0.15s 0.4s,
+        opacity 0.15s 0.25s,
+        width 0.15s 0.25s,
+        height 0.15s 0.4s,
+        border-radius 0.3s 0.25s;
+}
+
+#toolbarContainer:hover {
+    border-bottom-right-radius: 0;
+    height: 100px;
+    width: 100%;
+    opacity: 1;
+    border-bottom: 4px solid #202020;
+    transition:
+        background-color 0.15s,
+        opacity 0.15s,
+        width 0.15s 0.15s,
+        height 0.15s,
+        border-radius 0.3s;
+}
+
+#toolbarContainer>.material-icons {
+    margin: 2px;
+    position: fixed;
+    transition: opacity 0.2s 0.35s;
+    font-size: 32px;
+    opacity: 1;
+}
+
+#toolbarContainer:hover>.material-icons {
+    transition: opacity 0.2s 0.1s;
+    opacity: 0;
+}
+
+#toolbar {
+    opacity: 0;
+    transition: opacity 0.25s;
+    padding: 2px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: 100%;
+}
+
+#toolbarContainer:hover>#toolbar {
+    transition: opacity 0.4s .25s;
+    opacity: 1;
+    width: 100%;
+}
+
+#toolbarH>.material-icons {
+    font-size: 48px;
+    cursor: pointer;
+    transition: font-size 0.5s, color 0.5s;
+}
+
+#toolbarH>.material-icons:hover {
+    font-size: 64px;
+}
+
+#helpButton:hover {
+    color: #6699dd;
+}
+
+#saveButton:hover {
+    color: #4fe399;
+}
+
+#photoButton:hover {
+    color: #519b0c;
+}
+
+#trashButton:hover {
+    color: #eb2d2d;
+}
+
+#scrambleButton:hover {
+    /* color: transparent; */
+    background: linear-gradient(270deg, #ff4848, #ff962f, #fffb2f, #98ee36, #36ee9e, #36acee, #416bf0, #a241f0, #f041a4);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% 200%;
+    animation: Rainbow 10s ease infinite;
+}
+
+#toolbarH {
+    display: inline;
+}
+
+.half {
+    /* background-color: #ebebeb; */
+    background-color: #1a1a1a;
+}
+
+@keyframes Rainbow {
+    0% {
+        background-position: 0% 50%
+    }
+
+    50% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0% 50%
+    }
+}

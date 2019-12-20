@@ -1,0 +1,47 @@
+<html>
+
+<head>
+	<title>Fractory</title>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script> -->
+	<script src="../CommonLib/jquerymin.js"></script>
+	<script src="../CommonLib/split.min.js"></script>
+	<!-- <script src="../CommonLib/math.min.js"></script> -->
+	<script src="../CommonLib/NLib.js"></script>
+	<script src="../CommonLib/ResizeSensor/ResizeSensor.js"></script>
+	<script src="../CommonLib/ResizeSensor/ElementQueries.js"></script>
+	<script src="../CommonLib/Viewport/npoint.js"></script>
+	<script src="../CommonLib/Viewport/viewport.js"></script>
+	<script src="../CommonLib/Viewport/vpObject.js"></script>
+	<script src="./RandGen.js"></script>
+	<script src="./Editor/IVPNode.js"></script>
+	<script src="./Editor/NodeLink.js"></script>
+	<script src="./Editor/RotArrow.js"></script>
+	<script src="./Editor/PartEditor.js"></script>
+	<script src="./Viewer/ResultShape.js"></script>
+	<script src="./Viewer/ResultViewer.js"></script>
+	<script src="./Palettes.js"></script>
+	<script src="./main.js"></script>
+	<link rel="stylesheet" href="./style.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+	<div id="mainContainer" class="flexplit horiz">
+		<div class="split half" id="leftHalf"></div>
+		<div class="split half" id="rightHalf"></div>
+	</div>
+	<div id="toolbarContainer">
+		<i class="material-icons">menu</i>
+		<div id="toolbar">
+			<div id="toolbarH">
+				<i id="helpButton" class="material-icons tooltip">help_outline</i>
+				<!-- <i id="saveButton" class="material-icons tooltip">save_alt</i> -->
+				<i id="photoButton" class="material-icons tooltip">photo_camera</i>
+				<i id="trashButton" class="material-icons tooltip">delete_forever</i>
+				<i id="scrambleButton" class="material-icons tooltip">color_lens</i>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

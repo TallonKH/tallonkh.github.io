@@ -1,0 +1,115 @@
+<html>
+
+<head>
+    <title>Fractory Tutorial</title>
+    <link href="https://fonts.googleapis.com/css?family=Titillium+Web:300&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Titillium Web', sans-serif;
+            color: #ccc;
+            background-color: #444;
+        }
+
+        h1 {
+            font-size: 64px;
+            color: #fff;
+        }
+
+        h2 {
+            color: #fff;
+        }
+
+        .red {
+            color: #f33f3f;
+        }
+
+        .blue {
+            color: #0177e4;
+        }
+
+        .mono {
+            color: #f8d;
+            font-family: monospace;
+        }
+
+        .key {
+            color: #88b;
+        }
+
+        .section {
+            padding-left: 20px;
+            padding-bottom: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>
+        Fractory Tutorial
+    </h1>
+    <div class="section">
+        <h2>Creating Shapes</h2>
+        <p>
+            <span class="key">Click & drag</span> between two nodes to draw a line segment.
+            <br>
+            <span class="key">Click</span> on a blank node to create a <u class="red">root node</u>.
+            <br>
+            <span class="key">Click</span> on a line segment to destroy it.
+            <br>
+            <br>
+            The root node marks the origin of a shape.
+        </p>
+        <video loop controls class="tutvid">
+            <source src="./Shapes.mp4" type="video/mp4">
+        </video>
+    </div>
+    <hr>
+    <div class="section">
+        <h2>Creating Fractals</h2>
+        <p>
+            <span class="key">Shift-click</span> a blank node (or <span class="key">normal-click</span> a root node) to create a <u class="blue">branch node</u>.
+            <br><br>
+            At each branch node, the shape will be drawn again from its roots. This process is done
+            recursively, creating fractals.
+        </p>
+        <video loop controls class="tutvid">
+            <source src="./Nodes.mp4" type="video/mp4">
+            </video>
+        <p>
+            <span class="key">Click</span>ing on a node multiple times will cycle it between normal, root, and
+            branch.
+            <br>
+            <span class="key">Shift click</span>ing will cycle in the other direction.
+            <br>
+            <br>
+            <u>WARNING:</u> Do not have too many root nodes and branch nodes active at the same time!
+            <br>
+            The Fractory will become very slow if <span class="mono">(# of root nodes) x (# of branch nodes)</span> exceeds 9 or so.
+        </p>
+    </div>
+    <hr>
+    <div class="section">
+        <h2>Transformation</h2>
+        <p>
+            <span class="key">Click & drag</span> node arrows to rotate them.<br>
+            Hold down <span class="key">shift</span> to scale instead.<br>
+            Hold down <span class="key">alt</span>/<span class="key">option</span> to enable smooth rotating/scaling.<br>
+        </p>
+        <video loop controls>
+            <source src="./Transform.mp4" type="video/mp4">
+        </video>
+    </div>
+    <hr>
+    <div class="section">
+        <h2>Coloring</h2>
+        <p>
+            Press <span class="key">Space</span> to randomize a fractal's color scheme.
+        </p>
+        <video loop controls>
+            <source src="./Colors.mp4" type="video/mp4">
+        </video>
+    </div>
+</body>
+
+</html>
