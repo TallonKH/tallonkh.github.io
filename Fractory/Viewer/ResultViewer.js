@@ -10,6 +10,6 @@ class ResultViewer extends Viewport {
         });
         this.allShapes = [];
 
-        this.backgroundColor = "#1a1a1a"
+        this.background.color = "#1a1a1a";
     }
 }

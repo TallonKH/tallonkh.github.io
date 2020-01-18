@@ -5,10 +5,11 @@ class Viewport {
 		pannable = true,
 		zoomSensitivity = 1,
 		panSensitivity = 0.5,
-		zoomCenter = "mouse" //center, mouse, panCenter
+		zoomCenter = "mouse", //center, mouse, panCenter
+		backgroundClass = VPBackground
 	} = {}) {
 		this.redrawQueued
-		this.backgroundColor = "#ebebeb";
+		this.background = new backgroundClass(this);
 
 		this.zoomCenter = zoomCenter;
 		this.minZoomFactor = minZoomFactor;
@@ -24,7 +25,12 @@ class Viewport {
 		this.panSensitivity = panSensitivity;
 
 		this.mouseDown = false;
+		
+		/** raw mouse position (relative to viewport element) */
 		this.mouseElemPos = new NPoint();
+		this.mouseElemDownPos = new NPoint();
+		this.mouseElemDelta = new NPoint();
+
 		/** relative to viewport objects */
 		this.mousePos = new NPoint();
 		/** position where mouse was last pressed down */
@@ -78,11 +84,11 @@ class Viewport {
 		this.shiftDown = false;
 		this.altDown = false;
 		this.downKeys = new Set();
-
 		this.makeElements();
 		this.setupScrollLogic();
 		this.setupMouseListeners();
 		this.setupKeyListeners();
+		this.registerObj(this.background);
 	}
 
 	preOnMouseDown() {
@@ -282,12 +288,6 @@ class Viewport {
 		}
 	}
 
-	background() {
-		// this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-		this.ctx.fillStyle = this.backgroundColor;
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-	}
-
 	queueRedraw() {
 		if (!this.redrawQueued) {
 			this.redrawQueued = true;
@@ -297,7 +297,6 @@ class Viewport {
 
 	redraw() {
 		this.redrawQueued = false;
-		this.background();
 		const drawnObjIdsSorted = Array.from(this.drawnObjIds);
 		drawnObjIdsSorted.sort(this.getReversedDepthSorter());
 		for (const uuid of drawnObjIdsSorted) {
@@ -380,14 +379,16 @@ class Viewport {
 				}
 			}
 		}
-
+	
 		const prevMousedOverObjIds = new Set(this.mouseOverObjIds);
 		// existing & new moused over objs
-		for (const uuid of currentMousedOverObjIds) {
-			if (!prevMousedOverObjIds.has(uuid)) {
-				const obj = this.allObjs[uuid];
-				this.registerMouseOverObj(obj);
-				obj.onMouseEntered();
+		if (this.mouseWithin){
+			for (const uuid of currentMousedOverObjIds) {
+				if (!prevMousedOverObjIds.has(uuid)) {
+					const obj = this.allObjs[uuid];
+					this.registerMouseOverObj(obj);
+					obj.onMouseEntered();
+				}
 			}
 		}
 
@@ -496,6 +497,7 @@ class Viewport {
 
 		this.container.addEventListener("mousedown", function (e) {
 			self.queueRedraw();
+			self.mouseElemDownPos = self.mouseElemPos;
 			self.mouseDownPos = self.pageToViewSpace(self.mouseElemPos);
 			self.mouseDown = true;
 			self.preOnMouseDown();
@@ -539,11 +541,13 @@ class Viewport {
 		});
 
 		document.addEventListener("mousemove", function (e) {
-			self.mouseElemPos = new NPoint(
+			const newMouseElemPos = new NPoint(
 				e.pageX - self.container.offsetLeft,
 				e.pageY - self.container.offsetTop
 			);
-
+			
+			self.mouseElemDelta = newMouseElemPos.subtractp(self.mouseElemPos);
+			self.mouseElemPos = newMouseElemPos;
 			self.mousePosUpdated();
 		});
 	}

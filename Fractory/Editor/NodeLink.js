@@ -15,7 +15,7 @@ class NodeLink extends VPObject {
         if (this.nodeB == "mouse") {
             return false;
         }
-        return point.distToSegmentSquared(this.nodeA.position, this.nodeB.position) < Math.pow(this.thickness / 2, 2);
+        return point.distToSegmentSquared(this.nodeA.position, this.nodeB.position) < Math.pow(this.thickness * 2, 2);
     }
 
     isMouseBlockingOverlap() {

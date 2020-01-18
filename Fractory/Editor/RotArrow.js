@@ -2,7 +2,7 @@ class RotArrow extends VPObject {
     constructor(node, inverted, {} = {}) {
         super(node.vp, {
             "mouseListening": true,
-            "zOrder": 8
+            "zOrder": 14
         });
         this.node = node;
         this.inverted = inverted;
@@ -28,7 +28,7 @@ class RotArrow extends VPObject {
     }
 
     isOverlapping(point) {
-        return this.endpoint.subtractp(point).lengthSquared() < Math.pow(this.size * 1.5, 2);
+        return this.endpoint.subtractp(point).lengthSquared() < Math.pow(this.size * 2, 2);
     }
 
     onMouseEntered() {

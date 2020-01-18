@@ -21,7 +21,7 @@ class PartEditor extends Viewport {
         this.colorFunc = getRandColorFunc();
         this.widthFunc = getRandWidthFunc();
 
-        this.backgroundColor = "#1a1a1a";
+        this.background.color = "#1a1a1a";
 
         IVPNode.globalInit(this);
     }

@@ -67,6 +67,10 @@ class IVPNode extends VPObject {
         return true;
     }
 
+    isOverlapping(point) {
+        return this.position.subtractp(point).lengthSquared() < Math.pow(this.size * 2, 2);
+    }
+
     onDragStarted() {
         super.onDragStarted();
         this.suggestCursor("crosshair");
