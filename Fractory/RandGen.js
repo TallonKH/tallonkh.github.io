@@ -85,3 +85,13 @@ function getRandWidthFunc() {
         return lerp(upperWidth, lowerWidth, nvars["depth"] / nvars["maxDepth"]);
     }
 }
+
+function randSample(arr, n){
+    const result = [];
+    for(let m=0; m<n; m++){
+        const i = Math.floor(Math.random() * arr.length);
+        result.push(arr[i]);
+        arr.splice(i,1);
+    }
+    return result;
+}

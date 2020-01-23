@@ -99,16 +99,16 @@ class RotArrow extends VPObject {
         ctx.lineCap = "round";
 
         if (this.mouseOverlapping || this.dragged) {
-            ctx.lineWidth = 12 * this.vp.zoomFactor;
+            ctx.lineWidth = 12;// * this.vp.zoomFactor;
             ctx.strokeStyle = "#eeeeee"
             this.strokeLine(ctx, this.endpoint, tipCW);
             this.strokeLine(ctx, this.endpoint, tipCCW);
         }
 
         ctx.strokeStyle = this.inverted ? IVPNode.nodeStateColors[1] : IVPNode.nodeStateColors[2];
-        ctx.lineWidth = 2 * this.vp.zoomFactor;
+        ctx.lineWidth = 2;// * this.vp.zoomFactor;
         this.strokeLine(ctx, this.node.position, this.endpoint);
-        ctx.lineWidth = 6 * this.vp.zoomFactor;
+        ctx.lineWidth = 6;// * this.vp.zoomFactor;
         this.strokeLine(ctx, this.endpoint, tipCW);
         this.strokeLine(ctx, this.endpoint, tipCCW);
     }

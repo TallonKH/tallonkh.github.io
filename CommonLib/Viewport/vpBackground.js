@@ -8,8 +8,11 @@ class VPBackground extends VPObject {
     }
 
     draw(ctx) {
+        let currentTransform = ctx.getTransform();
+        ctx.resetTransform();
         ctx.fillStyle = this.color;
         ctx.fillRect(0, 0, this.vp.canvas.width, this.vp.canvas.height);
+        ctx.setTransform(currentTransform);
     }
 
     isOverlapping(point) {

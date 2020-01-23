@@ -20,29 +20,43 @@ class IVPNode extends VPObject {
         this.color = "#888888";
     }
 
+    static makeLink(vpp, nodeA, nodeB) {
+        const link = new NodeLink(nodeA, nodeB);
+        vpp.registerObj(link);
+        return IVPNode.tryLink(link, vpp);
+    }
+
+    static tryLink(candidateLink, vpp) {
+        if (candidateLink) {
+            if (candidateLink.nodeA && candidateLink.nodeB && candidateLink.nodeB != candidateLink.nodeA) {
+                const code = candidateLink.recalcPairCode();
+                if (vpp.linkPairCodes.has(code)) {
+                    vpp.forget(candidateLink);
+                } else {
+                    vpp.linkPairCodes.add(code);
+                    vpp.links.add(candidateLink);
+                    candidateLink.nodeA.links.add(candidateLink);
+                    candidateLink.nodeB.links.add(candidateLink);
+                    vpp.onLinkMade(candidateLink);
+                    vpp.queueRedraw();
+                    return true;
+                }
+            } else {
+                vpp.forget(candidateLink);
+            }
+        }
+        return false;
+    }
+
     static globalInit(vp) {
         vp.postMouseUpListeners["IVPU"] = function (vpp) {
             const candidateLink = vpp.mouseLink;
             if (candidateLink) {
-                if (vpp.linkCandidate && vpp.linkCandidate != candidateLink.nodeA) {
-                    candidateLink.nodeB = vpp.linkCandidate;
-                    const code = candidateLink.recalcPairCode();
-                    if (vpp.linkPairCodes.has(code)) {
-                        vpp.forget(candidateLink);
-                    } else {
-                        vpp.linkPairCodes.add(code);
-                        vpp.links.add(candidateLink);
-                        candidateLink.nodeA.links.add(candidateLink);
-                        candidateLink.nodeB.links.add(candidateLink);
-                        vpp.onLinkMade(candidateLink);
-                        vpp.queueRedraw();
-                    }
-                } else {
-                    vpp.forget(candidateLink);
-                }
+                candidateLink.nodeB = vpp.linkCandidate;
+                IVPNode.tryLink(candidateLink, vpp);
+                vpp.mouseLink = null;
+                vpp.linkCandidate = null;
             }
-            vpp.mouseLink = null;
-            vpp.linkCandidate = null;
         }
     }
 
@@ -53,7 +67,7 @@ class IVPNode extends VPObject {
         }
         this.fillCircle(ctx);
         if (this.mouseOverlapping) {
-            ctx.lineWidth = 2 * this.vp.zoomFactor;
+            ctx.lineWidth = 2;// * this.vp.zoomFactor;
             ctx.strokeStyle = "#eeeeee"
             this.strokeCircle(ctx);
         }
@@ -102,11 +116,15 @@ class IVPNode extends VPObject {
 
     onClicked() {
         super.onClicked();
-        if(this.vp.shiftDown){
+        if (this.vp.shiftDown) {
             this.nodeState = floorMod(this.nodeState - 1, IVPNode.nodeStates.length);
-        }else{
+        } else {
             this.nodeState = (this.nodeState + 1) % IVPNode.nodeStates.length;
         }
+        this.nodeStateChanged();
+    }
+
+    nodeStateChanged() {
         this.color = IVPNode.nodeStateColors[this.nodeState];
 
 
@@ -144,5 +162,5 @@ class IVPNode extends VPObject {
     }
 }
 
-IVPNode.nodeStates = ["Plain", "Root", "Branch"];//, "Both"]
-IVPNode.nodeStateColors = ["#888888", "#f33f3f", "#0177e4"]//, "#a517d9"]
+IVPNode.nodeStates = ["Plain", "Root", "Branch"]; //, "Both"]
+IVPNode.nodeStateColors = ["#888888", "#f33f3f", "#0177e4"] //, "#a517d9"]

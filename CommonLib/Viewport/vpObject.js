@@ -13,8 +13,8 @@ class VPObject {
         this.drawable = drawable;
         this.mouseListening = mouseListening;
         this.zOrder = zOrder;
-        
         this.zSubOrder = 0;
+        
         this.mouseOverlapping = false;
         this.held = false;
         this.grabbed = false;
@@ -60,8 +60,8 @@ class VPObject {
     }
 
     strokeLine(ctx, posA, posB) {
-        posA = this.vp.canvasToViewSpace(posA);
-        posB = this.vp.canvasToViewSpace(posB);
+        // posA = this.vp.canvasToViewSpace(posA);
+        // posB = this.vp.canvasToViewSpace(posB);
         ctx.beginPath();
         ctx.moveTo(posA.x, posA.y);
         ctx.lineTo(posB.x, posB.y);
@@ -69,11 +69,12 @@ class VPObject {
     }
 
     fillCircle(ctx) {
-        const adPos = this.vp.canvasToViewSpace(this.position);
+        // const adPos = this.vp.canvasToViewSpace(this.position);
+        const adPos = this.position;
         ctx.beginPath();
         ctx.ellipse(
             adPos.x, adPos.y,
-            this.size * this.vp.zoomFactor, this.size * this.vp.zoomFactor,
+            this.size /* * this.vp.zoomFactor*/, this.size /* * this.vp.zoomFactor*/,
             0,
             0, 2 * Math.PI);
         ctx.fill();
@@ -81,11 +82,12 @@ class VPObject {
 
     strokeCircle(ctx, scale = 1) {
         const self = this;
-        const adPos = this.vp.canvasToViewSpace(self.position);
+        // const adPos = this.vp.canvasToViewSpace(self.position);
+        const adPos = this.position;
         ctx.beginPath();
         ctx.ellipse(
             adPos.x, adPos.y,
-            self.size * this.vp.zoomFactor * scale, self.size * this.vp.zoomFactor * scale,
+            self.size /*  * this.vp.zoomFactor */ * scale, self.size /* * this.vp.zoomFactor */ * scale,
             0,
             0, 2 * Math.PI);
         ctx.stroke();

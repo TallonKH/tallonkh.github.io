@@ -71,7 +71,7 @@ class NodeLink extends VPObject {
         }
 
         ctx.lineCap = "round";
-        ctx.lineWidth = this.thickness * this.vp.zoomFactor;
+        ctx.lineWidth = this.thickness;// * this.vp.zoomFactor;
         ctx.strokeStyle = "#666666"
         this.strokeLine(ctx, posA, posB);
     };

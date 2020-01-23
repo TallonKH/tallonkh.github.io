@@ -4,6 +4,10 @@ var leftHalf;
 var rightHalf;
 var editor;
 var shape;
+var colorFuncQueue = [];
+var widthFuncQueue = [];
+var shiftDown = false;
+var ctrlDown = false;
 
 const horizSplitterArgs = {
     direction: "horizontal",
@@ -17,13 +21,14 @@ const toolbarSplitterArgs = {
 
 $(function () {
     setupElements();
+    editor.randomShape();
 });
 
 function setupElements() {
     helpButton.onclick = e => window.open("./Tutorial/Tutorial.html");
-    photoButton.onclick = function(){
+    photoButton.onclick = function () {
         const name = prompt("Screenshot taken. What would you like to name it?")
-        if(name){
+        if (name) {
             saveCanvas(viewer.canvas, name);
         }
     }
@@ -51,12 +56,51 @@ function setupElements() {
 }
 
 document.addEventListener("keydown", function (e) {
-    if (e.which == 32) {
-        scrambleColors();
+    switch (e.which) {
+        case 16:
+            shiftDown = true;
+            break;
+        case 17:
+            ctrlDown = true;
+            break;
+        case 32:
+            if (ctrlDown) {
+                editor.randomShape();
+            } else {
+                if (shiftDown) {
+                    if (colorFuncQueue.length > 0) {
+                        editor.colorFunc = colorFuncQueue.pop();
+                        editor.widthFunc = widthFuncQueue.pop();
+                        shape.recalcColors();
+                        shape.recalcWidths();
+                        viewer.queueRedraw();
+                    }
+                } else {
+                    scrambleColors();
+                }
+            }
+            break;
+    }
+});
+
+document.addEventListener("keyup", function (e) {
+    switch (e.which) {
+        case 16:
+            shiftDown = false;
+            break;
+        case 17:
+            ctrlDown = false;
+            break;
     }
 });
 
 function scrambleColors() {
+    if (colorFuncQueue.length > 24) {
+        colorFuncQueue.shift();
+        widthFuncQueue.shift();
+    }
+    colorFuncQueue.push(editor.colorFunc);
+    widthFuncQueue.push(editor.widthFunc);
     editor.colorFunc = getRandColorFunc();
     editor.widthFunc = getRandWidthFunc();
     shape.recalcColors();

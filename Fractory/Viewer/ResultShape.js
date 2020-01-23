@@ -52,13 +52,14 @@ class ResultShape extends VPObject {
         this.calcPartGeometry(new NPoint(), 0, 1, this.maxDepth);
         this.recalcColors();
         this.recalcWidths();
+        this.vp.queueRedraw();
     }
 
     draw(ctx) {
         // ctx.globalCompositeOperation = this.vp.blendMode;
         ctx.lineCap = "round";
         for (const line of this.lines) {
-            ctx.lineWidth = line.width * this.vp.zoomFactor;
+            ctx.lineWidth = line.width;// * this.vp.zoomFactor;
             ctx.strokeStyle = line.color;
             this.strokeLine(ctx, line.aPos.multiply1(100), line.bPos.multiply1(100));
         }
