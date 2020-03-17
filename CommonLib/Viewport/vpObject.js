@@ -56,7 +56,7 @@ class VPObject {
 
     draw(ctx) {
         ctx.fillStyle = "black";
-        this.fillCircle();
+        this.fillCircle(ctx);
     }
 
     strokeLine(ctx, posA, posB) {

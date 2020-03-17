@@ -371,7 +371,7 @@ class Viewport {
 		this.redrawQueued = false;
 		const drawnObjIdsSorted = Array.from(this.drawnObjIds);
 		drawnObjIdsSorted.sort(this.getReversedDepthSorter());
-		this.ctx.setTransform(this.zoomFactor, 0, 0, -this.zoomFactor, this.panCenter.x + this.vpCenter.x, this.panCenter.y + this.vpCenter.y);
+		this.ctx.setTransform(this.zoomFactor, 0, 0, this.zoomFactor, this.panCenter.x + this.vpCenter.x, this.panCenter.y + this.vpCenter.y);
 		for (const uuid of drawnObjIdsSorted) {
 			const obj = this.allObjs[uuid];
 			obj.draw(this.ctx);
@@ -402,12 +402,12 @@ class Viewport {
 	}
 
 	pageToViewSpace(npoint) {
-		return npoint.subtractp(this.panCenter.addp(this.vpCenter)).divide1(this.zoomFactor).multiply2(1, -1); //.subtract2(this.canvas.width / 2, this.canvas.height / 2);
+		return npoint.subtractp(this.panCenter.addp(this.vpCenter)).divide1(this.zoomFactor).multiply2(1, 1); //.subtract2(this.canvas.width / 2, this.canvas.height / 2);
 		// return npoint.subtractp(this.panCenter).divide1(this.zoomFactor).subtract2(this.canvas.width / 2, this.canvas.height / 2).multiply2(1, -1);
 	}
 
 	canvasToViewSpace(npoint) {
-		return npoint.multiply2(1, -1).add2(this.canvas.width / 2, this.canvas.height / 2).multiply1(this.zoomFactor).addp(this.panCenter.addp(this.vpCenter));
+		return npoint.multiply2(1, 1).add2(this.canvas.width / 2, this.canvas.height / 2).multiply1(this.zoomFactor).addp(this.panCenter.addp(this.vpCenter));
 	}
 
 	setupScrollLogic() {
@@ -549,7 +549,7 @@ class Viewport {
 					const zoomDelta = self.zoomFactor - prevZoom;
 					switch (self.zoomCenter) {
 						case "center":
-							self.panCenter = self.panCenter.subtractp(self.vpCenter.subtractp(self.panCenter).divide1(prevZoom).multiply1(self.zoomFactor - prevZoom));
+							self.panCenter = new NPoint(0,0);//self.panCenter.subtractp(self.vpCenter.subtractp(self.panCenter).divide1(prevZoom).multiply1(self.zoomFactor - prevZoom));
 							break;
 						case "mouse":
 							self.panCenter = self.panCenter.subtractp(self.mouseElemPos.subtractp(self.panCenter.addp(self.vpCenter)).divide1(prevZoom).multiply1(self.zoomFactor - prevZoom));

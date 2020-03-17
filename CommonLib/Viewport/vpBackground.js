@@ -29,16 +29,22 @@ class VPBackground extends VPObject {
 
     onDragStarted() {
         super.onDragStarted();
-        this.suggestCursor("move");
+        if (this.vp.pannable) {
+            this.suggestCursor("move");
+        }
     }
-    
+
     onDragged() {
         super.onDragged();
-        this.vp.panCenter = this.vp.panCenter.addp(this.vp.mouseElemDelta);
+        if (this.vp.pannable) {
+            this.vp.panCenter = this.vp.panCenter.addp(this.vp.mouseElemDelta);
+        }
     }
 
     onDragEnded() {
         super.onDragEnded();
-        this.unsuggestCursor("move");
+        if (this.vp.pannable) {
+            this.unsuggestCursor("move");
+        }
     }
 }
