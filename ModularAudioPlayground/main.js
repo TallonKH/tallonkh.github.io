@@ -151,7 +151,7 @@ function updateVols() {
         const tracks = [base1, base2, base3, laser, emitter, target1, target2, crash, beat];
         let oof = false;
         for (const trck of tracks) {
-            if (Math.abs(trck.currentTime - wind.currentTime) > 0.02) {
+            if (Math.abs(trck.currentTime - wind.currentTime) > 0.1) {
                 console.log(Math.abs(trck.currentTime - wind.currentTime));
                 oof = true;
                 break;
