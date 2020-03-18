@@ -146,27 +146,30 @@ function updateVols() {
     crash.volume = clamp(crashVol, 0, 0.8);
     beat.volume = clamp(beatVol * (1 - distM), 0, 1);
 
-    const tracks = [base1, base2, base3, laser, emitter, target1, target2, crash, beat];
-    let oof = false;
-    for(const trck of tracks){
-        if (Math.abs(trck.currentTime - wind.currentTime) > 0.02) {
-            console.log(Math.abs(trck.currentTime - wind.currentTime));
-            oof = true;
-            break;
+    if (tick > 120) {
+        tick = 0;
+        const tracks = [base1, base2, base3, laser, emitter, target1, target2, crash, beat];
+        let oof = false;
+        for (const trck of tracks) {
+            if (Math.abs(trck.currentTime - wind.currentTime) > 0.02) {
+                console.log(Math.abs(trck.currentTime - wind.currentTime));
+                oof = true;
+                break;
+            }
         }
-    }
-    
-    if(oof && !wind.paused){
-        wind.pause();
-        for(trck of tracks){
-            trck.pause();
-            trck.currentTime = wind.currentTime;
+
+        if (oof && !wind.paused) {
+            wind.pause();
+            for (trck of tracks) {
+                trck.pause();
+                trck.currentTime = wind.currentTime;
+            }
+            setTimeout(resumeAll, 100);
         }
-        setTimeout(resumeAll, 100);
     }
 }
 
-function resumeAll(){
+function resumeAll() {
     wind.play();
     base1.play();
     base2.play();
