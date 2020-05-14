@@ -17,8 +17,15 @@ class PartEditor extends Viewport {
         this.partChangeListeners = new Set();
 
         this.setupNodes();
-        this.colorFunc = getRandColorFunc();
-        this.widthFunc = getRandWidthFunc();
+        this.colorFunc = function (nvars) {
+            return colorLerp(
+                colorLerp("#CE4257", "#F3A712", Math.cos(nvars["srcRot"]) / 2 + 0.5) || "#CE4257",
+                colorLerp("#5544C4", "#76E6B3", Math.cos(nvars["brnRot"]) / 2 + 0.5) || "#76E6B3",
+                nvars["depth"] / nvars["maxDepth"]);
+        };
+        this.widthFunc = function (nvars) {
+            return 4;
+        };;
 
         this.background.color = "#1a1a1a";
 
@@ -27,11 +34,17 @@ class PartEditor extends Viewport {
 
     setupNodes() {
         const radius = 3;
+        this.nodeGrid = new Array(radius * 2 + 1);
         for (let ix = -radius; ix <= radius; ix++) {
+
+            const row = new Array(radius * 2 + 1);
+            this.nodeGrid[ix + radius] = row;
+
             for (let iy = -radius; iy <= radius; iy++) {
                 const node = new IVPNode(this, new NPoint(ix, iy));
                 node.position = new NPoint(ix * 100, iy * 100);
                 this.nodes.add(node);
+                row[iy + radius] = node;
                 this.registerObj(node);
             }
         }

@@ -21,7 +21,20 @@ const toolbarSplitterArgs = {
 
 $(function () {
     setupElements();
-    editor.randomShape();
+    
+    const node0 = editor.nodeGrid[3][3];
+    const node1 = editor.nodeGrid[2][2];
+    const node2 = editor.nodeGrid[4][2];
+    node0.nodeState = 1;
+    node1.nodeState = 2;
+    node2.nodeState = 2;
+    node0.nodeStateChanged();
+    node1.nodeStateChanged();
+    node2.nodeStateChanged();
+    IVPNode.makeLink(editor, node0, node1);
+    IVPNode.makeLink(editor, node0, node2);
+    // editor.randomShape();
+    viewer.zoomFactor = 2;
 });
 
 function setupElements() {

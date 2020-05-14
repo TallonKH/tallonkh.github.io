@@ -23,7 +23,7 @@ class RotArrow extends VPObject {
         const scal = this.node.scale * 25 * (this.inverted ? -0.75 : 1);
         this.endpoint = this.node.position.add2(
             Math.sin(this.node.rotation) * scal,
-            Math.cos(this.node.rotation) * scal
+            -Math.cos(this.node.rotation) * scal
         )
     }
 
@@ -66,8 +66,8 @@ class RotArrow extends VPObject {
                 }
             }
         }else{
-            let angle = -(this.vp.mousePos.subtractp(this.node.position).getAngle() + Math.PI / 2);
-            if (!this.inverted) {
+            let angle = (this.vp.mousePos.subtractp(this.node.position).getAngle()) + Math.PI / 2;
+            if (this.inverted) {
                 angle = Math.PI + angle;
             }
             if (!this.vp.altDown) {
@@ -86,12 +86,12 @@ class RotArrow extends VPObject {
         const rotCW = rotation + Math.PI * 0.75;
         const tipCW = this.endpoint.add2(
             Math.sin(rotCW) * tipLength,
-            Math.cos(rotCW) * tipLength
+            -Math.cos(rotCW) * tipLength
         )
         const rotCCW = rotation - Math.PI * 0.75;
         const tipCCW = this.endpoint.add2(
             Math.sin(rotCCW) * tipLength,
-            Math.cos(rotCCW) * tipLength
+            -Math.cos(rotCCW) * tipLength
         )
 
         // ctx.strokeStyle = this.vp.backgroundColor;

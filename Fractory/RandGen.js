@@ -73,7 +73,6 @@ function getRandColorFunc() {
     }
 }
 
-
 var widthGen = gaussianGenerator(4, 4);
 var widthGen2 = gaussianGenerator(2, 4);
 

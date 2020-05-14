@@ -93,7 +93,7 @@ class ResultShape extends VPObject {
             }
             for (const branchNode of this.nodeLists[2]) {
                 const posR = branchNode.dPosition.subtractp(rootNode.dPosition).rotate(rott).multiply1(scal).addp(srcPos);
-                this.calcPartGeometry(posR, rott - branchNode.rotation, scal * branchNode.scale, depthCounter - 1);
+                this.calcPartGeometry(posR, rott + branchNode.rotation, scal * branchNode.scale, depthCounter - 1);
             }
         }
     }

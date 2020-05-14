@@ -10,6 +10,33 @@
             background-color: #444;
         }
 
+        #back {
+            font-size: 40px;
+            text-align: center;
+            width: 100%;
+            height: 300px;
+            margin-top: 220px;
+        }
+
+        #back>a{
+            background-color: #454545;
+            color: #77CD77;
+            text-decoration: none;
+            border: 4px solid #77CD77;
+            padding: 10px;
+            border-radius: 2px;
+            transition: 0.2s;
+        }
+
+        #back>a:hover{
+            background-color: #505050;
+            color: #66EE66;
+            text-decoration: none;
+            border: 4px solid #66EE66;
+            padding: 15px;
+            border-radius: 2px;
+        }
+
         h1 {
             font-size: 64px;
             color: #fff;
@@ -68,14 +95,15 @@
     <div class="section">
         <h2>Creating Fractals</h2>
         <p>
-            <span class="key">Shift-click</span> a blank node (or <span class="key">normal-click</span> a root node) to create a <u class="blue">branch node</u>.
+            <span class="key">Shift-click</span> a blank node (or <span class="key">normal-click</span> a root node) to
+            create a <u class="blue">branch node</u>.
             <br><br>
             At each branch node, the shape will be drawn again from its roots. This process is done
             recursively, creating fractals.
         </p>
         <video loop controls class="tutvid">
             <source src="./Nodes.mp4" type="video/mp4">
-            </video>
+        </video>
         <p>
             <span class="key">Click</span>ing on a node multiple times will cycle it between normal, root, and
             branch.
@@ -85,7 +113,8 @@
             <br>
             <u>WARNING:</u> Do not have too many root nodes and branch nodes active at the same time!
             <br>
-            The Fractory will become very slow if <span class="mono">(# of root nodes) x (# of branch nodes)</span> exceeds 9 or so.
+            The Fractory will become very slow if <span class="mono">(# of root nodes) x (# of branch nodes)</span>
+            exceeds 9 or so.
         </p>
     </div>
     <hr>
@@ -94,7 +123,8 @@
         <p>
             <span class="key">Click & drag</span> node arrows to rotate them.<br>
             Hold down <span class="key">shift</span> to scale instead.<br>
-            Hold down <span class="key">alt</span>/<span class="key">option</span> to enable smooth rotating/scaling.<br>
+            Hold down <span class="key">alt</span>/<span class="key">option</span> to enable smooth
+            rotating/scaling.<br>
         </p>
         <video loop controls>
             <source src="./Transform.mp4" type="video/mp4">
@@ -104,14 +134,19 @@
     <div class="section">
         <h2>Coloring</h2>
         <p>
-            Press <span class="key">Space</span> to randomize a fractal's color scheme & width. 
-            <br/>
+            Press <span class="key">Space</span> to randomize a fractal's color scheme & width.
+            <br />
             Press <span class="key">shift+Space</span> to revert to a previous color scheme (up to 25 times).
         </p>
         <video loop controls>
             <source src="./Colors.mp4" type="video/mp4">
         </video>
     </div>
+    <hr>
+    <div id="back">
+        <a href="../index.html">Ok. Take me back to the Fractory!</a>
+    </div>
+    <hr>
 </body>
 
 </html>
