@@ -24,13 +24,14 @@ const defaultDrawFunc = (ctx, brush) => drawImage(ctx, brush, mousePos, 0);
 const dataManipFunc = (ctx, dims, scale, func) => {
   const w = dims[0] * scale * drawSize;
   const h = dims[1] * scale * drawSize;
-  const dx = ~~clamp(mousePos[0] - (w / 2), 0, can.width);
-  const dy = ~~clamp(mousePos[1] - (h / 2), 0, can.height);
+  const dx = mousePos[0] - (w / 2);
+  const dy = mousePos[1] - (h / 2);
+  const cdx = ~~clamp(dx, 0, can.width);
+  const cdy = ~~clamp(dy, 0, can.height);
   const imageData = ctx.getImageData(
-    dx, dy,
-    ~~clamp(w, 0, can.width), ~~clamp(h, 0, can.height));
-  func(imageData);
-  ctx.putImageData(imageData, dx, dy);
+    cdx, cdy,
+    ~~clamp(dx + w, 0, can.width) - cdx, ~~clamp(dy + h, 0, can.height) - cdy);
+  ctx.putImageData(func(imageData) ?? imageData, cdx, cdy);
 }
 const brushes = [{
     name: "Cursor",
@@ -134,7 +135,7 @@ const brushes = [{
     buttonTint: filterTint,
     drawFunc: (ctx, brush) => dataManipFunc(ctx, brush.dims, brush.scale, (data) => {
       const raw = data.data;
-      for (let i = 0; i < raw.length - 4; i++) {
+      for (let i = 0; i < raw.length - 7; i++) {
         raw[i] = raw[i + 4];
         raw[i + 1] = raw[i + 5];
         raw[i + 2] = raw[i + 6];
@@ -183,26 +184,31 @@ const brushes = [{
     buttonTint: filterTint,
     drawFunc: (ctx, brush) => dataManipFunc(ctx, brush.dims, brush.scale, (data) => {
       const raw = data.data;
-      for (let x = 0; x < data.width; x++) {
-        for (let y = 0; y < data.height - 1; y++) {
+      for (let x = 0; x < data.width - 1; x++) {
+        for (let y = Math.round(Math.random()); y < data.height - 1; y+=2) {
           const i1 = (x + y * data.width) * 4;
-          const i2 = i1 + data.width * 4;
+          const i2 = (x + (y+1) * data.width) * 4;
+          if(raw[i1+3] < 50 || raw[i2+3] < 50){
+            continue;
+          }
 
-          const hsl1 = rgb_hsl(raw[i1] / 255, raw[i1 + 1] / 255, raw[i1 + 2] / 255);
-          const hsl2 = rgb_hsl(raw[i2] / 255, raw[i2 + 1] / 255, raw[i2 + 2] / 255);
+          const hsl1 = rgb_hsl(raw[i1 + 0] / 255, raw[i1 + 1] / 255, raw[i1 + 2] / 255);
+          const hsl2 = rgb_hsl(raw[i2 + 0] / 255, raw[i2 + 1] / 255, raw[i2 + 2] / 255);
 
-          if (hsl1[0] < hsl2[0]) {
-            const r1 = raw[i1];
-            const g1 = raw[i1 + 1];
-            const b1 = raw[i1 + 2];
-            const a = Math.max(raw[i1 + 3], raw[i2 + 3]);
-            raw[i1] = raw[i2];
+          if ((raw[i1 + 3] - raw[i2 + 3] || hsl1[0] - hsl2[0] || hsl1[1] - hsl2[1] || hsl1[2] - hsl2[2]) < 0) {
+            const r = raw[i1 + 0];
+            const g = raw[i1 + 1];
+            const b = raw[i1 + 2];
+            const a = raw[i1 + 3];
+            // const a = Math.max(raw[i1 + 3], raw[i2 + 3])
+            raw[i1 + 0] = raw[i2 + 0];
             raw[i1 + 1] = raw[i2 + 1];
             raw[i1 + 2] = raw[i2 + 2];
-            raw[i1 + 3] = a;
-            raw[i2] = r1;
-            raw[i2 + 1] = g1;
-            raw[i2 + 2] = b1;
+            raw[i1 + 3] = raw[i2 + 3];
+
+            raw[i2 + 0] = r;
+            raw[i2 + 1] = g;
+            raw[i2 + 2] = b;
             raw[i2 + 3] = a;
           }
         }
@@ -228,7 +234,7 @@ const brushes = [{
           const i1 = (x + y * data.width) * 4;
           const hsl1 = rgb_hsl(raw[i1] / 255, raw[i1 + 1] / 255, raw[i1 + 2] / 255);
           const i2 = i1 + data.width * 4;
-          
+
           const hsl2 = rgb_hsl(raw[i2] / 255, raw[i2 + 1] / 255, raw[i2 + 2] / 255);
 
           if (hsl1[2] > hsl2[2]) {
@@ -287,6 +293,7 @@ new ResizeObserver((es) => {
   const e = es[0];
   displayDims[0] = e.contentRect.width;
   displayDims[1] = e.contentRect.height;
+  updateBrushPreviewDims();
 }).observe(can);
 
 drawImage = (ctx, imgDat, position, rotation) => {
@@ -352,8 +359,8 @@ const brushPreview = document.getElementById("cursor");
 const brushPreviewDims = Object.seal([0, 0]);
 const updateBrushPreviewDims = () => {
   const brush = brushes[activeBrush];
-  brushPreviewDims[0] = brush.dims[0] * brush.scale * drawSize;
-  brushPreviewDims[1] = brush.dims[1] * brush.scale * drawSize;
+  brushPreviewDims[0] = brush.dims[0] * brush.scale * drawSize * displayDims[0] / can.width;
+  brushPreviewDims[1] = brush.dims[1] * brush.scale * drawSize * displayDims[0] / can.height;
 
   brushPreview.style.width = brushPreviewDims[0] + "px";
   brushPreview.style.height = brushPreviewDims[1] + "px";
@@ -504,7 +511,7 @@ for (let i = 0; i < brushes.length; i++) {
 const body2 = document.getElementById("body2");
 can.addEventListener("drop", (e) => {
   body2.classList.remove("dragover");
-  if(e.dataTransfer.items){
+  if (e.dataTransfer.items) {
     const item = e.dataTransfer.items[0];
     if (item.kind === "file") {
       const file = item.getAsFile();
@@ -521,7 +528,7 @@ can.addEventListener("drop", (e) => {
 });
 
 can.addEventListener("dragover", (e) => {
-  e.preventDefault();  
+  e.preventDefault();
 });
 
 can.addEventListener("dragenter", (e) => {
