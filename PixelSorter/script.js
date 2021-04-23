@@ -61,13 +61,15 @@ imgInput.addEventListener("change", (e) => {
 
 const loadingMessage = document.getElementById("loading");
 
-let minThreshold = 50;
-let maxThreshold = 255;
-let thresholdType = 6;
 let sortType = 4;
 let sortDirection = "vertical";
 let sortFlipDirection = false;
 let sortChance = 0.95;
+
+let minThreshold = 50;
+let maxThreshold = 255;
+let thresholdType = 6;
+let thresholdChance = 1;
 
 let redrawQueued = false;
 let redrawCooldownActive = false;
@@ -106,7 +108,7 @@ const redraw = () => {
 
   if (sortDirection === "horizontal") {
     for (let y = 0; y < h; y++) {
-      if(Math.random() > sortChance){
+      if (Math.random() > sortChance) {
         continue;
       }
       let xMin = 0;
@@ -122,7 +124,11 @@ const redraw = () => {
           color = getColor(x, y);
         }
 
-        if (x < w && thresholdFunc(color) && (sortChance === 1 || Math.random() < sortChance)) {
+        if (x < w &&
+          (sortChance !== 0) &&
+          (thresholdChance === 0 || thresholdFunc(color) || Math.random() >= thresholdChance) &&
+          (sortChance === 1 || Math.random() < sortChance)) {
+
           currentlyValid = true;
 
           const colorVal = colorValFunc(color);
@@ -169,7 +175,11 @@ const redraw = () => {
           color = getColor(x, y);
         }
 
-        if (y < h && thresholdFunc(color) && (sortChance === 1 || Math.random() < sortChance)) {
+        if (y < h &&
+          (sortChance !== 0) &&
+          (thresholdChance === 0 || thresholdFunc(color) || Math.random() >= thresholdChance) &&
+          (sortChance === 1 || Math.random() < sortChance)) {
+
           currentlyValid = true;
 
           const colorVal = colorValFunc(color);
@@ -230,6 +240,7 @@ const settings = [
   [
     document.getElementById("threshold-slider-min"),
     document.getElementById("threshold-slider-max"),
+    document.getElementById("threshold-random-slider"),
     document.getElementById("sort-flip"),
     document.getElementById("sort-direction"),
     document.getElementById("random-slider"),
@@ -252,6 +263,13 @@ maxThresholdSlider.addEventListener("input", (e) => {
   maxThreshold = parseInt(e.target.value);
   minThreshold = Math.min(minThreshold, maxThreshold);
   minThresholdSlider.value = minThreshold;
+  requestRedraw();
+});
+
+const thresholdRandomSlider = document.getElementById("threshold-random-slider");
+thresholdRandomSlider.value = thresholdChance * 1000;
+thresholdRandomSlider.addEventListener("input", (e) => {
+  thresholdChance = parseInt(e.target.value) / 1000;
   requestRedraw();
 });
 
