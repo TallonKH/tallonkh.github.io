@@ -28,6 +28,10 @@ html {
   background: #888a;
   /* backdrop-filter: blur(1px); */
   border-radius: 3vmin;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 #can:active {
