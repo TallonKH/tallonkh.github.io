@@ -269,7 +269,7 @@ sortDirectionCheckbox.addEventListener("input", (e) => {
 });
 
 const randomSlider = document.getElementById("random-slider");
-randomSlider.value = Math.pow(sortChance * 1000, 2);
+randomSlider.value = Math.pow(sortChance, 2) * 1000;
 randomSlider.addEventListener("input", (e) => {
   sortChance = Math.sqrt(parseInt(e.target.value) / 1000);
   requestRedraw();
