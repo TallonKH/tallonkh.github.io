@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Sorter</title>
+</head>
+
+<body>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <div id="body2">
+    <div class="center-container" style="width:100%;height:100%;flex-direction:row;">
+      <div class="section canvas center-container"
+        style="width:100%;height:100%;flex-direction:column;flex-basis: 70%;">
+        <canvas id="can"></canvas>
+        <!-- <img id="upload-icon" src="./upload.png" alt="Drop an image here."> -->
+        <div id="no-image-warning">Upload/drop an image here!</div>
+        <div id="loading">Sorting...</div>
+      </div>
+      <div class="section settings"
+        style="display:flex;align-items: flex-start;justify-content:center;width:100%;height:100%;flex-direction:column;flex-basis: 30%;">
+
+        <div class="settings pane">
+          Sorting
+          <div class="right-list">
+            <label class="setting-label">Probability
+              <input id="random-slider" class="setting range" type="range" min="0" max="1000" step="1">
+            </label>
+            <label class="setting-label">Vertical
+              <input class="setting checkbox" type="checkbox" id="sort-direction">
+            </label>
+            <label class="setting-label">Reverse
+              <input class="setting checkbox" type="checkbox" id="sort-flip">
+            </label>
+          </div>
+
+          <div class="right-list">
+            <label class="setting-label">Hue
+              <input class="setting radio" type="radio" name="sort-radio" value="4">
+            </label>
+
+            <label class="setting-label">Saturation
+              <input class="setting radio" type="radio" name="sort-radio" value="5">
+            </label>
+
+            <label class="setting-label">Lightness
+              <input class="setting radio" type="radio" name="sort-radio" value="6" checked="true">
+            </label>
+
+            <label class="setting-label">Red
+              <input class="setting radio" type="radio" name="sort-radio" value="0">
+            </label>
+
+            <label class="setting-label">Green
+              <input class="setting radio" type="radio" name="sort-radio" value="1">
+            </label>
+
+            <label class="setting-label">Blue
+              <input class="setting radio" type="radio" name="sort-radio" value="2">
+            </label>
+
+            <label class="setting-label">Opacity
+              <input class="setting radio" type="radio" name="sort-radio" value="3">
+            </label>
+          </div>
+        </div>
+
+        <div class="settings pane">
+          Threshold
+          <div class="right-list">
+            <label class="setting-label">Minimum
+              <input id="threshold-slider-min" class="setting range" type="range" min="0" max="255" step="1">
+            </label>
+            <label class="setting-label">Maximum
+              <input id="threshold-slider-max" class="setting range" type="range" min="0" max="255" step="1">
+            </label>
+          </div>
+
+          <div class="right-list">
+
+            <label class="setting-label">Hue
+              <input class="setting radio" type="radio" name="threshold-radio" value="4">
+            </label>
+
+            <label class="setting-label">Saturation
+              <input class="setting radio" type="radio" name="threshold-radio" value="5">
+            </label>
+
+            <label class="setting-label">Lightness
+              <input class="setting radio" type="radio" name="threshold-radio" value="6" checked="true">
+            </label>
+
+            <label class="setting-label">Red
+              <input class="setting radio" type="radio" name="threshold-radio" value="0">
+            </label>
+
+            <label class="setting-label">Green
+              <input class="setting radio" type="radio" name="threshold-radio" value="1">
+            </label>
+
+            <label class="setting-label">Blue
+              <input class="setting radio" type="radio" name="threshold-radio" value="2">
+            </label>
+
+            <label class="setting-label">Opacity
+              <input class="setting radio" type="radio" name="threshold-radio" value="3">
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="img-input" style="display:none;">
+  <script src="./script.js"></script>
+</body>
+
+</html>

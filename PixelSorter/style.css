@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Raleway', Arial, Helvetica, sans-serif;
+}
+
+body,
+html {
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+  width: 100%;
+  background: #58bcd4;
+  background: linear-gradient(0deg, #4b4b4b 0%, #969696 49%, #c4c4c4 96%);
+}
+
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#body2 {
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+  width: 100%;
+}
+
+#can {
+  border: 0.75vmin solid #eee;
+  min-width: 50%;
+  min-height: 50%;
+
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+
+  background: #ddd0;
+  /* backdrop-filter: blur(1px); */
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transition: 0.3s;
+  border-radius: 1vmin;
+}
+
+#can.dragover {
+  /* background-color: #2e3f33cc; */
+  border: 0.75vmin solid #4cff73;
+  box-shadow: 0px 0px 2vmin #8effa6;
+}
+
+#upload-icon {
+  width: calc(25% - 2vmin);
+  height: auto;
+  position: absolute;
+  image-rendering: pixelated;
+  transition: 0.3s;
+  user-select: none;
+  pointer-events: none;
+}
+
+#can.dragover+#upload-icon,
+#can:hover+#upload-icon {
+  width: calc(30% - 2vmin);
+  filter: drop-shadow(0.5vmin 0.5vmin 4px #d4d4d4);
+}
+
+#can.dragover+#no-image-warning,
+#can:hover+#no-image-warning {
+  font-size: xx-large;
+}
+
+
+.section {
+  /* border: 0.75vmin solid #222; */
+}
+
+.section.canvas {
+  padding: 1vmin;
+}
+
+.settings.pane {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border: 0.1vmin solid #222;
+  border-radius: 1vmin;
+  background-color: #4444;
+  padding: 1vmin;
+  margin: 1vmin;
+
+  color: #ffffff;
+  font-size: x-large;
+  font-weight: lighter;
+}
+
+.setting-label {
+  font-size: medium;
+  font-weight: normal;
+  color: #eee;
+}
+
+.right-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+#no-image-warning{
+  position: absolute;
+  font-size: x-large;
+  font-weight: bold;
+  color: #eee;
+  box-shadow: 2px 2px 4px #000;
+  margin: 2vmin;
+  background-color: #b82626;
+  padding: 1.5vmin;
+  border-radius: 5vmin;
+  user-select: none;
+  transition: 0.3s;
+  pointer-events: none;
+}
+
+#can.dragover+#no-image-warning,
+#can:hover+#no-image-warning {
+  font-size: xx-large;
+}
+
+#loading {
+  position: absolute;
+  color: #fff;
+  font-size: x-large;
+  display: none;
+}
