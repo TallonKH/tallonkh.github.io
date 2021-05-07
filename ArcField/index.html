@@ -7,13 +7,14 @@
 
 <body>
   <script src="./lib/gpu-browser.min.js"></script>
-  <!-- <label>Resolution (%)
-    <input name="render-settings" type="range" id="resolutionSlider" min="10" max="100">
-  </label> -->
+  
   <div style="color: white; font-family: Arial, Helvetica, sans-serif; font-size: large">
-    Press <i>Space</i> to randomize. <i>Click</i> to create a burst. <i>Shift+Click</i> to create a big burst. Scroll down a
-    bit to get rid of this text.
+    Press <i>Space</i> to randomize. 
+    <i>Click</i> to create a burst. 
+    <i>Shift+Click</i> to create a big burst. 
+    Scroll down a bit to get rid of this text.
   </div>
+  
   <div id="outer">
     <div id="canvas-parent"></div>
   </div>
@@ -23,6 +24,7 @@
   <style>
     * {
       box-sizing: border-box;
+      user-select: none;
     }
 
     html {

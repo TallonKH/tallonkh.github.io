@@ -27,7 +27,7 @@ const searchDistanceOptions = [3, 4];
 const searchRadiusOptions = [0, 1, 2];
 const searchAngleOptions = [0.2, 0.3, 0.4, 0.5];
 const changeAngleOptions = [0.2, 0.3, 0.4, 0.5];
-const straightRandomOptions = [0.05, 0.1, 0.2, 0.5];
+const straightRandomOptions = [0.05, 0.1, 0.2, 0.3, 0.5];
 const inversionOptions = [0, 0, 0, 0, 0, 0, 0, 1];
 const args = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
@@ -85,12 +85,6 @@ const onWindowChangeEnd = () => {
   cansw = rect.width;
   cansh = rect.height;
 
-  // console.log("resize end ", canw, canh);
-  // do this because the gpu messes up when the canvas isn't square and the inputs are floats 
-
-  // canw = Math.floor(Math.min(canw, canh));
-  // canh = canw;
-
   // updateDims();
   // setup();
 }
@@ -104,7 +98,21 @@ const requestWindowChangeEndEvent = () => {
   }, 200);
 }
 
-
+function search(grid, x, y, searchDistance, searchRadius, simw, simh, searchdx, searchdy){
+  let found = 0;
+  const cx = x + searchdx * searchDistance;
+  const cy = y + searchdy * searchDistance;
+  const minX = Math.max(0, cx - searchRadius);
+  const maxX = Math.min(simw - 1, cx + searchRadius);
+  const minY = Math.max(0, cy - searchRadius);
+  const maxY = Math.min(simh - 1, cy + searchRadius);
+  for (let sx = minX; sx <= maxX; sx++) {
+    for (let sy = minY; sy <= maxY; sy++) {
+      found += grid[Math.floor(sx)][Math.floor(sy)];
+    }
+  }
+  return found;
+}
 
 // function to create a new kernel (only needed upon resize)
 const setup = () => {
@@ -120,9 +128,7 @@ const setup = () => {
     const col = new Array(simh);
     grid[x] = col;
     for (let y = 0; y < simh; y++) {
-      // flatGrid[x + y * simw] = Math.min(x / simw, y / simh);
       col[y] = 0;
-      // col[y] = Math.pow(Math.random(), 5);
     }
   }
 
@@ -177,67 +183,13 @@ const setup = () => {
     const dx = Math.cos(rot);
     const dy = Math.sin(rot);
 
-    // {
-    //   const searchDistMin = 1;
-    //   const searchDistMax = 1;
-    //   let bestAngle = rot;
-    //   let bestVal = 0;
-    //   for (let r = searchDistMin; r <= searchDistMax; r++) {
-    //     const deltaAngle = 1 / (3.14159 * r);
-    //     for (let angle = rot - 1; angle <= rot + 1; angle += deltaAngle) {
-    //       const val = grid[Math.floor(x + Math.cos(angle) * r)][Math.floor(y + Math.sin(angle) * r)];
-    //       if(val > bestVal){
-    //         bestAngle = angle;
-    //         bestVal = val;
-    //       }
-    //     }
-    //   }
-    //   rot = bestAngle;
-    // }
-
     const searchDistance = args[3];
     const searchRadius = args[4];
     const searchAngle = args[5];
 
-    let valAhead = 0; {
-      const cx = x + dx * searchDistance;
-      const cy = y + dy * searchDistance;
-      const minX = Math.max(0, cx - searchRadius);
-      const maxX = Math.min(simw - 1, cx + searchRadius);
-      const minY = Math.max(0, cy - searchRadius);
-      const maxY = Math.min(simh - 1, cy + searchRadius);
-      for (let sx = minX; sx <= maxX; sx++) {
-        for (let sy = minY; sy <= maxY; sy++) {
-          valAhead += grid[Math.floor(sx)][Math.floor(sy)];
-        }
-      }
-    }
-    let valLeft = 0; {
-      const cx = x + Math.cos(rot - searchAngle) * searchDistance;
-      const cy = y + Math.sin(rot - searchAngle) * searchDistance;
-      const minX = Math.max(0, cx - searchRadius);
-      const maxX = Math.min(simw - 1, cx + searchRadius);
-      const minY = Math.max(0, cy - searchRadius);
-      const maxY = Math.min(simh - 1, cy + searchRadius);
-      for (let sx = minX; sx <= maxX; sx++) {
-        for (let sy = minY; sy <= maxY; sy++) {
-          valLeft += grid[Math.floor(sx)][Math.floor(sy)];
-        }
-      }
-    }
-    let valRight = 0; {
-      const cx = x + Math.cos(rot + searchAngle) * searchDistance;
-      const cy = y + Math.sin(rot + searchAngle) * searchDistance;
-      const minX = Math.max(0, cx - searchRadius);
-      const maxX = Math.min(simw - 1, cx + searchRadius);
-      const minY = Math.max(0, cy - searchRadius);
-      const maxY = Math.min(simh - 1, cy + searchRadius);
-      for (let sx = minX; sx <= maxX; sx++) {
-        for (let sy = minY; sy <= maxY; sy++) {
-          valRight += grid[Math.floor(sx)][Math.floor(sy)];
-        }
-      }
-    }
+    const valAhead = search(grid, x, y, searchDistance, searchRadius, simw, simh, dx, dy);
+    const valLeft = search(grid, x, y, searchDistance, searchRadius, simw, simh, Math.cos(rot - searchAngle), Math.sin(rot - searchAngle));
+    const valRight = search(grid, x, y, searchDistance, searchRadius, simw, simh, Math.cos(rot + searchAngle), Math.sin(rot + searchAngle));
 
     if (valAhead < valLeft || valAhead < valRight) {
       const changeAngle = args[6];
@@ -261,8 +213,8 @@ const setup = () => {
     }
   }, {
     output: [dotCount],
-    tactic: 'speed'
-  });
+    tactic: 'speed',
+  }).setFunctions([search]);
 
   // create a new display kernel
   dispKernel = gpu.createKernel(function (grid, simw, simh, args) {
@@ -299,8 +251,8 @@ const setup = () => {
     e.preventDefault();
     const x = ~~Math.max(0, Math.min((1 - (e.clientY - rect.top) / cansh) * simw, simw - 1));
     const y = ~~Math.max(0, Math.min(((e.clientX - rect.left) / cansw) * simh, simh - 1));
-    
-    if(e.shiftKey){
+
+    if (e.shiftKey) {
       for (let n = 0; n < dotCount; n++) {
         dots[n] = [
           x,
@@ -308,7 +260,7 @@ const setup = () => {
           Math.random() * 6.28318
         ];
       }
-    }else{
+    } else {
       for (let n = 0; n < dotCount * 0.1; n++) {
         const i = ~~(Math.random() * dotCount);
         dots[i] = [
