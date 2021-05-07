@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>ArcField</title>
+</head>
+
+<body>
+  <script src="./lib/gpu-browser.min.js"></script>
+  <!-- <label>Resolution (%)
+    <input name="render-settings" type="range" id="resolutionSlider" min="10" max="100">
+  </label> -->
+  <div style="color: white; font-family: Arial, Helvetica, sans-serif; font-size: xx-large">
+    Press space to randomize. Click to create a burst. Scroll down a bit to get rid of this text.
+  </div>
+  <div id="outer">
+    <div id="canvas-parent"></div>
+  </div>
+
+  <script src="./script.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      height: 100%;
+      padding: 0px;
+    }
+
+    body {
+      background: #000;
+      height: 100%;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    #outer {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #canvas-parent {
+      height: 100%;
+      /* width: 100%; */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .display {
+      image-rendering: pixelated;
+    }
+  </style>
+</body>
+
+</html>
