@@ -296,15 +296,27 @@ const setup = () => {
   dispKernel.canvas.style.height = "100vmin";
 
   dispKernel.canvas.addEventListener("click", (e) => {
+    e.preventDefault();
     const x = ~~Math.max(0, Math.min((1 - (e.clientY - rect.top) / cansh) * simw, simw - 1));
     const y = ~~Math.max(0, Math.min(((e.clientX - rect.left) / cansw) * simh, simh - 1));
-    for (let n = 0; n < dotCount * 0.1; n++) {
-      const i = ~~(Math.random() * dotCount);
-      dots[i] = [
-        x,
-        y,
-        Math.random() * 6.28318
-      ];
+    
+    if(e.shiftKey){
+      for (let n = 0; n < dotCount; n++) {
+        dots[n] = [
+          x,
+          y,
+          Math.random() * 6.28318
+        ];
+      }
+    }else{
+      for (let n = 0; n < dotCount * 0.1; n++) {
+        const i = ~~(Math.random() * dotCount);
+        dots[i] = [
+          x,
+          y,
+          Math.random() * 6.28318
+        ];
+      }
     }
   });
 
