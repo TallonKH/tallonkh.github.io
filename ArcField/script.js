@@ -80,7 +80,7 @@ const updateDims = () => {
 }
 // updateDims();
 
-const onResizeEnd = () => {
+const onWindowChangeEnd = () => {
   rect = canvasParent.getBoundingClientRect();
   cansw = rect.width;
   cansh = rect.height;
@@ -95,14 +95,16 @@ const onResizeEnd = () => {
   // setup();
 }
 
-let resizeFinishTimer = null;
-// call onResizeEnd when resizing has stopped
-(new ResizeObserver((es) => {
-  window.clearTimeout(resizeFinishTimer);
-  resizeFinishTimer = window.setTimeout(() => {
-    onResizeEnd();
+let windowChangeTimer = null;
+const requestWindowChangeEndEvent = () => {
+  // call onWindowChangeEnd when window change has stopped
+  window.clearTimeout(windowChangeTimer);
+  windowChangeTimer = window.setTimeout(() => {
+    onWindowChangeEnd();
   }, 200);
-})).observe(canvasParent);
+}
+
+
 
 // function to create a new kernel (only needed upon resize)
 const setup = () => {
@@ -352,6 +354,10 @@ document.addEventListener("keypress", (e) => {
   }
 });
 
+// window change on scroll
+document.addEventListener("scroll", requestWindowChangeEndEvent)
+// window change on resize
+new ResizeObserver(requestWindowChangeEndEvent).observe(canvasParent);
 
 scrambleArgs();
 updateDims();
