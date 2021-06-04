@@ -97,6 +97,17 @@ a {
   font-size: x-large;
 }
 
+.grid-square span.year {
+  color: #888;
+  float: right;
+  font-style: italic;
+  font-size: medium;
+}
+
+/* .grid-square.bad .title, .grid-square.bad .desc {
+  background-color: #300c;
+} */
+
 .grid-square .desc {
   position: absolute;
   bottom: -20px;
@@ -118,19 +129,11 @@ a {
 }
 
 a.link {
-  font-style: italic;
-  color: #4ff9ff;
-  transition: all 0.1s;
+  font-weight: normal;
+  color: #8ffdff;
+  transition: all 0.2s;
 }
+
 a.link:hover {
-  font-style: italic;
-  color: #4fb0ff;
-}
-a.link:visited {
-  font-style: italic;
-  color: #7674ff;
-}
-a.link:visited:hover {
-  font-style: italic;
-  color: #4f4dff;
+  text-shadow: 0px 0px 2px #71cfd1;
 }
