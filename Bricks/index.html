@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>brick.</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+		<link type="text/css" rel="stylesheet" href="main.css" />
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@100;300&display=swap" rel="stylesheet" />
+	</head>
+	<body>
+		<div id="stats">
+			<div id="stats-title">Stats:</div>
+			<div id="stats-list"></div>
+		</div>
+		<style>
+			#stats {
+				position: absolute;
+				padding: 50px;
+
+				font-family: "Azeret Mono", monospace;
+			}
+
+			#stats-title {
+				font-size: 200%;
+				font-weight: 300;
+			}
+
+			.stats-item {
+				font-size: 120%;
+			}
+		</style>
+		<script src="./perlin.js"></script>
+		<script type="module">
+			import * as THREE from "https://cdn.skypack.dev/three";
+			import { OBJLoader } from "https://cdn.skypack.dev/three/examples/jsm/loaders/OBJLoader.js";
+
+			const rand = (ls) => {
+				if (ls.length === 0) {
+					return null;
+				}
+
+				return ls[Math.floor(Math.random() * ls.length)];
+			};
+
+			const poprand = (ls) => {
+				const i = Math.floor(Math.random() * ls.length);
+				const item = ls[i];
+				ls.splice(i, 1);
+				return item;
+			};
+
+			let camera, scene, renderer;
+
+			let w = 1000;
+			let h = 1000;
+
+			const textureNames = [
+				"./textures/asphalt.jpg",
+				"./textures/cracked.jpg",
+				"./textures/plaster.jpg",
+				"./textures/concrete.jpg",
+				"./textures/granite.jpg",
+				"./textures/specs.jpg",
+				"./textures/crunchy.jpg",
+				"./textures/sandy.jpg",
+			];
+
+			const textures = textureNames.map((name) =>
+				new THREE.TextureLoader().load(name, (tex) => {
+					tex.wrapS = THREE.RepeatWrapping;
+					tex.wrapT = THREE.RepeatWrapping;
+				})
+			);
+
+			const colors = [
+				"#d66151",
+				"#f08273",
+				"#871e10",
+				"#a8493d",
+				"#9e6a64",
+				"#ff8585",
+				"#d48c8c",
+				"#665050",
+				"#7d6b5b",
+				"#751614",
+				"#c4702f",
+				"#996311",
+				"#eda066",
+				"#9c612f",
+				"#bab9b5",
+				"#aabcbd",
+				"#75736c",
+				"#88a695",
+			];
+
+      const bgColors = [
+        0x212121,
+        0x454242,
+        0x2e2a2a,
+        0x1d2b19,
+        0x192b23,
+        0x19282b,
+        0x191c2b,
+        0x22152b,
+        0x2b1526,
+        0x2b1517,
+        0x454011,
+        0x4d300e,
+        0x541508,
+        0x540824,
+        0x520924,
+        0x570d39,
+        0x530d57,
+        0x321452,
+        0x1a1452,
+        0x142852,
+        0x144752,
+        0x14523c,
+        0x145215,
+      ];
+
+			const statContainer = document.getElementById("stats-list");
+
+			function init() {
+				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+				camera.position.z = 400;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color(0x222222);
+				const light1 = new THREE.PointLight(0xcfedff);
+				light1.position.set(50, 50, 200);
+				scene.add(light1);
+				const light2 = new THREE.PointLight(0xffedcf);
+				light2.position.set(-50, 10, 200);
+				scene.add(light2);
+
+				// mesh = new THREE.Mesh();
+				newbrick();
+
+				renderer = new THREE.WebGLRenderer({ antialias: true });
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				document.body.appendChild(renderer.domElement);
+
+				window.addEventListener("resize", onWindowResize);
+			}
+
+			function generateStats() {
+				const possibles = [
+					`May contain ${rand([
+						"brick",
+						"meat",
+						"dairy",
+						"gluten",
+						"wheat",
+						"sand",
+						"fish",
+						"air",
+						"?????",
+						"[redacted]",
+						"birds",
+						"the souls of the damned",
+						"the void",
+						"antimatter",
+						"protons",
+						"matter",
+						"vital organs",
+						"hair",
+						"peanuts",
+						"sand",
+						"clay",
+						"rocks",
+					])}!`,
+					`${Math.round(Math.random() * 100)}% ${rand([
+						"durable",
+						"safe",
+						"dangerous",
+						"flammable",
+						"evasive",
+						"invasive",
+						"sneaky",
+						"solid",
+						"radioactive",
+						"interesting",
+						"brick-like",
+						"intimidating",
+						"attractice",
+						"glamorous",
+						"pretty",
+						"disturbing",
+						"reassuring",
+						"brick",
+					])}!`,
+					`${rand([
+						"Water",
+						"Fire",
+						"Acid",
+						"Hammer",
+						"Throw",
+						"Drop",
+						"Brick",
+						"Bird",
+						"Light",
+						"Heat",
+						"Storm",
+						"Lightning",
+					])}-resistant!`,
+					`New and improved!`,
+					`Locally sourced!`,
+					`Organic!`,
+					`Synthetic!`,
+					`Carbonated!`,
+					`GMO-free!`,
+					`Probably red!`,
+					`Fresh!`,
+					`Fun for the whole family!`,
+					`Non-toxic!`,
+					`Try it today!`,
+					`Satisfaction guaranteed!`,
+					`Comes in groups!`,
+					`????`,
+					`Now capable of ${rand([
+						"flight",
+						"being used as a brick",
+						"being used as a projectile",
+						"being used as a weapon",
+						"swimming",
+						"emotion",
+						"singing",
+						"yelling",
+						"whispering",
+						"invading your dreams",
+						"fear",
+						"moving",
+						"playing tennis",
+						"playing piano",
+						"eating pasta",
+						"staying perfectly still",
+						"anything",
+						"nothing",
+						"downloading malware",
+						"falling",
+					])}!`,
+					`It's a brick!`,
+					`Glows in the dark!`,
+					`Discovered in ${rand([
+						"the swiss alps",
+						"a garage sale",
+						"a parking lot",
+						"my lungs",
+						"the middle of nowhere",
+						"a library",
+						"Arizona",
+						"the desert",
+						"my backyard",
+						"a house",
+						"a wall",
+						"a hole",
+						"an abandoned mineshaft",
+						"a haunted house",
+						"a mysterious portal",
+						"the infernal depths of hell",
+						"the ocean",
+						"another dimension",
+						"a parallel reality",
+						"a refrigerator",
+						"the outer reaches of space",
+						"prison",
+					])}!`,
+					`Defies modern science!`,
+					`Simply amazing!`,
+					`Never before seen!`,
+					`Can be used in ${rand([
+						"buildings",
+						"houses",
+						"skyscrapers",
+						"ruins",
+						"floors",
+						"ceilings",
+						"carpets",
+						"airplanes",
+						"windows",
+						"cars",
+						"nothing",
+						"catapults",
+						"grenade launchers",
+						"gourmet dishes",
+						"smoothies",
+						"various soups",
+						"a bathtub",
+						"a blender",
+						"a pool",
+						"a fireplace",
+						"legal disputes",
+						"combat",
+						"duels",
+						"logical debates",
+						"things that use bricks",
+						"treehouses",
+					])}!`,
+					`Health: ${Math.round(Math.random() * 100)}/100`,
+					`Intelligence: ${Math.round(Math.random() * 100)}/100`,
+					`Stamina: ${Math.round(Math.random() * 100)}/100`,
+					`Energy: ${Math.round(Math.random() * 100)}/100`,
+					`Charisma: ${Math.round(Math.random() * 100)}/100`,
+					`Dexterity: ${Math.round(Math.random() * 100)}/100`,
+					`Hunger: ${Math.round(Math.random() * 100)}/100`,
+					`Premium!`,
+					`Stone-ground!`,
+					`Bespoke!`,
+					`Hand-picked!`,
+					`Gourmet!`,
+					`Roasted!`,
+					`Glazed!`,
+					`Authentic!`,
+					`Sun-dried!`,
+					`Extra sharp!`,
+					`Artisanal!`,
+					`All-natural!`,
+					`Original flavor!`,
+					`Won't stab you!`,
+					`Dangerous!`,
+					`Mostly non-lethal!`,
+					`Please send help I'm trapped in a brick factory!`,
+					`Detailed!`,
+					`Knowledgeable!`,
+					`Absolute!`,
+					`Acclaimed!`,
+					`Digital!`,
+					`Long-lasting!`,
+					`Accurate!`,
+					`Diligent!`,
+					`Lean!`,
+					`Likable!`,
+					`Dramatic!`,
+					`Admired!`,
+					`Mellow!`,
+					`Memorable!`,
+					`Modern!`,
+					`Mysterious!`,
+					`Neat!`,
+					`Elegant!`,
+					`Noteworthy!`,
+					`Nutritious!`,
+					`Amusing!`,
+					`Original!`,
+					`Esteemed!`,
+					`Antique!`,
+					`Popular!`,
+					`Polished!`,
+					`Exotic!`,
+					`Expensive!`,
+				];
+
+				const outs = [];
+				for (let i = 0; i < 2 + Math.random() * 4; i++) {
+					outs.push(poprand(possibles));
+				}
+				return outs;
+			}
+
+			const objLoader = new OBJLoader();
+			const shapeNames = [
+				"./models/lopsided.obj",
+				"./models/basic.obj",
+				"./models/cinder.obj",
+				"./models/indent.obj",
+				"./models/indents2.obj",
+				"./models/indents3.obj",
+				"./models/modular.obj",
+				"./models/eroded.obj",
+				"./models/deformed.obj",
+				"./models/domino.obj",
+				"./models/lumpy.obj",
+				"./models/octagon.obj",
+			];
+
+			const bricks = [];
+			for (const shapeName of shapeNames) {
+				objLoader.load(
+					shapeName,
+					(obj) => {
+						bricks.push(obj);
+						console.log(shapeName, obj);
+					},
+					(e) => {},
+					(err) => {
+						console.log(err);
+					}
+				);
+			}
+
+			let activeBrick = null;
+			let speed = 0.5;
+			function newbrick() {
+				if (activeBrick !== null) {
+					scene.remove(activeBrick);
+				}
+
+				activeBrick = rand(bricks);
+				if (activeBrick === null) {
+					return;
+				}
+
+        scene.background = new THREE.Color(rand(bgColors));
+
+				scene.add(activeBrick);
+
+				activeBrick.scale.set(75 + Math.random() * 50, 75 + Math.random() * 50, 75 + Math.random() * 50);
+
+				const mat = new THREE.MeshStandardMaterial({
+					map: rand(textures),
+					bumpMap: rand(textures),
+					aoMap: rand(textures),
+					metalness: 0,
+					roughness: 0.8 + Math.random() * 0.2,
+					// roughnessMap: textures[Math.floor(Math.random() * textures.length)],
+					color: colors[Math.floor(Math.random() * colors.length)],
+				});
+				activeBrick.traverse(function (child) {
+					if (child instanceof THREE.Mesh) {
+						if (child.material) {
+							child.material.dispose();
+						}
+						child.material = mat;
+					}
+				});
+
+				speed = Math.pow(Math.random(), 4) * 5;
+				activeBrick.rotation.x = Math.random() * 4;
+				activeBrick.rotation.y = Math.random() * 4;
+
+				statContainer.innerHTML = "";
+				for (const stat of generateStats()) {
+					const statDiv = document.createElement("div");
+					statDiv.classList.add("stats-item");
+					statDiv.innerText = "* " + stat;
+					statContainer.append(statDiv);
+				}
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize(window.innerWidth, window.innerHeight);
+
+				w = window.innerWidth;
+				h = window.innerHeight;
+			}
+
+			noise.seed(Math.random());
+
+			let vx = 0;
+			let vy = 0;
+
+			let mx = 0;
+			let my = 0;
+			document.addEventListener("mousemove", (e) => {
+				mx = e.clientX;
+				my = e.clientY;
+			});
+
+			// document.addEventListener("keydown", (e) => {
+			// 	newbrick();
+			// });
+
+			let time = 0;
+
+			function animate() {
+				requestAnimationFrame(animate);
+				time++;
+
+				if (activeBrick) {
+					vx = noise.perlin2(speed * 1000 + mx * 0.001, time * 0.01) * 0.1;
+					vy = noise.perlin2(speed * 1000 + my * 0.001, time * 0.01) * 0.1;
+
+					activeBrick.rotation.x += (vx + (mx / w - 0.5) * 0.1) * speed + 0.01;
+					activeBrick.rotation.y += (vy + (my / h - 0.5) * 0.1) * speed + 0.01;
+				}
+
+				renderer.render(scene, camera);
+			}
+
+			init();
+			animate();
+
+			setInterval(() => {
+				newbrick();
+			}, 2000);
+		</script>
+	</body>
+</html>
