@@ -11,13 +11,39 @@
 		<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@100;300&display=swap" rel="stylesheet" />
 	</head>
 	<body>
-		<div id="stats">
-			<div id="stats-title">Stats:</div>
-			<div id="stats-list"></div>
+		<div id="name-box"></div>
+		<div id="sidebar">
+			<div id="stats">
+				(hold to pause brick creation)
+				<div id="stats-title">Stats:</div>
+				<div id="stats-list"></div>
+			</div>
 		</div>
 		<style>
-			#stats {
+			#name-box {
 				position: absolute;
+				padding: 50px;
+				top: 0px;
+				width: 100%;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+
+				font-size: 300%;
+				font-family: cursive;
+
+				text-shadow: 0px 0px 4px black;
+			}
+
+			#sidebar {
+				position: absolute;
+				height: 100%;
+				left: 0px;
+				display: flex;
+				align-items: center;
+			}
+
+			#stats {
 				padding: 50px;
 
 				font-family: "Azeret Mono", monospace;
@@ -33,9 +59,31 @@
 			}
 		</style>
 		<script src="./perlin.js"></script>
+		<script src="./adjectives.js"></script>
+		<script src="./names.js"></script>
 		<script type="module">
 			import * as THREE from "https://cdn.skypack.dev/three";
 			import { OBJLoader } from "https://cdn.skypack.dev/three/examples/jsm/loaders/OBJLoader.js";
+
+			let holding = 0;
+
+			const nameBox = document.getElementById("name-box");
+
+			document.addEventListener("pointerdown", (e) => {
+				holding++;
+			});
+
+			document.addEventListener("pointerup", (e) => {
+				holding--;
+			});
+
+			document.addEventListener("pointercancel", (e) => {
+				holding--;
+			});
+
+			document.addEventListener("pointerout", (e) => {
+				holding--;
+			});
 
 			const rand = (ls) => {
 				if (ls.length === 0) {
@@ -96,31 +144,11 @@
 				"#88a695",
 			];
 
-      const bgColors = [
-        0x212121,
-        0x454242,
-        0x2e2a2a,
-        0x1d2b19,
-        0x192b23,
-        0x19282b,
-        0x191c2b,
-        0x22152b,
-        0x2b1526,
-        0x2b1517,
-        0x454011,
-        0x4d300e,
-        0x541508,
-        0x540824,
-        0x520924,
-        0x570d39,
-        0x530d57,
-        0x321452,
-        0x1a1452,
-        0x142852,
-        0x144752,
-        0x14523c,
-        0x145215,
-      ];
+			const bgColors = [
+				0x212121, 0x454242, 0x2e2a2a, 0x1d2b19, 0x192b23, 0x19282b, 0x191c2b, 0x22152b, 0x2b1526, 0x2b1517, 0x454011,
+				0x4d300e, 0x541508, 0x540824, 0x520924, 0x570d39, 0x530d57, 0x321452, 0x1a1452, 0x142852, 0x144752, 0x14523c,
+				0x145215,
+			];
 
 			const statContainer = document.getElementById("stats-list");
 
@@ -405,7 +433,9 @@
 					return;
 				}
 
-        scene.background = new THREE.Color(rand(bgColors));
+				nameBox.innerText = `${rand(adjectives)} ${rand(names)}`;
+
+				scene.background = new THREE.Color(rand(bgColors));
 
 				scene.add(activeBrick);
 
@@ -470,11 +500,39 @@
 
 			let time = 0;
 
-			function animate() {
+			function smoothstep(x) {
+				x = clamp01(x);
+				return x * x * (3 - 2 * x);
+			}
+
+			function clamp01(x) {
+				if (x >= 1) {
+					return 1;
+				}
+				if (x <= 0) {
+					return 0;
+				}
+				return x;
+			}
+
+			let last = 0;
+			let holdAnimate = 0;
+			let delta = 0;
+			function animate(now) {
+				delta = now - last;
+				if (isNaN(delta)) {
+					delta = 0;
+				}
+
+				last = now;
+
 				requestAnimationFrame(animate);
 				time++;
 
+				holdAnimate = clamp01(holdAnimate + (holding ? delta : -delta) * 0.01);
+
 				if (activeBrick) {
+					activeBrick.position.z = -150 + smoothstep(holdAnimate) * 150;
 					vx = noise.perlin2(speed * 1000 + mx * 0.001, time * 0.01) * 0.1;
 					vy = noise.perlin2(speed * 1000 + my * 0.001, time * 0.01) * 0.1;
 
@@ -489,7 +547,9 @@
 			animate();
 
 			setInterval(() => {
-				newbrick();
+				if (holding === 0) {
+					newbrick();
+				}
 			}, 2000);
 		</script>
 	</body>
