@@ -65,24 +65,29 @@
 			import * as THREE from "https://cdn.skypack.dev/three";
 			import { OBJLoader } from "https://cdn.skypack.dev/three/examples/jsm/loaders/OBJLoader.js";
 
-			let holding = 0;
+			let touchDown = 0;
+			let mouseDown = false;
 
 			const nameBox = document.getElementById("name-box");
 
-			document.addEventListener("pointerdown", (e) => {
-				holding++;
+			document.addEventListener("mousedown", (e) => {
+				mouseDown = true;
 			});
 
-			document.addEventListener("pointerup", (e) => {
-				holding--;
+			document.addEventListener("mouseup", (e) => {
+				mouseDown = false;
 			});
 
-			document.addEventListener("pointercancel", (e) => {
-				holding--;
+			document.addEventListener("mouseout", (e) => {
+				mouseDown = false;
 			});
 
-			document.addEventListener("pointerout", (e) => {
-				holding--;
+			document.addEventListener("touchstart", (e) => {
+				touchDown++;
+			});
+
+			document.addEventListener("touchend", (e) => {
+				touchDown--;
 			});
 
 			const rand = (ls) => {
@@ -529,6 +534,7 @@
 				requestAnimationFrame(animate);
 				time++;
 
+				const holding = mouseDown || touchDown > 0;
 				holdAnimate = clamp01(holdAnimate + (holding ? delta : -delta) * 0.01);
 
 				if (activeBrick) {
@@ -547,7 +553,7 @@
 			animate();
 
 			setInterval(() => {
-				if (holding === 0) {
+				if (!(mouseDown || touchDown > 0)) {
 					newbrick();
 				}
 			}, 2000);
