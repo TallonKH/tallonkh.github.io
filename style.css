@@ -21,12 +21,12 @@ a {
   text-decoration: inherit;
 }
 
-#main-container {
+.main-container {
   margin-left: auto;
   margin-right: auto;
 }
 
-#main-title {
+.main-title {
   margin-top: 20px;
   color: #222;
   width: 100%;
@@ -34,7 +34,7 @@ a {
   text-align: center;
 }
 
-#main-subtitle {
+.main-subtitle {
   color: #333;
   width: 100%;
   font-size: 4vw;
@@ -42,7 +42,7 @@ a {
   text-align: center;
 }
 
-#main-subsubtitle {
+.main-subsubtitle {
   color: #444;
   width: 100%;
   font-size: 2vw;
@@ -60,6 +60,33 @@ a {
   padding: var(--grid-spacing);
   margin: 50px;
   border-radius: 20px;
+}
+
+.github-container {
+  transition: all 0.4s;
+  background-color: #161b22;
+  padding: var(--grid-spacing);
+  margin: 50px;
+  border-radius: 20px;
+  color: #eee;
+
+  font-size: 4vw;
+  font-weight: lighter;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.github-container:hover {
+  box-shadow: 0px 0px 8px #000000;
+  text-shadow: 0px 0px 6px #bff5ff;
 }
 
 .grid-square-outer {
