@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<script src="./npoint.js"></script>
+		<div id="output"></div>
+		<style>
+			body, html {
+				touch-action: none;
+				height: 100%;
+				width: 100%;
+				margin: 0px;
+				padding: 0px;
+			}
+			#output {
+				background-color: #eee;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				position: absolute;
+				height: 100%;
+				width: 100%;
+				font-size: 80vw;
+			}
+		</style>
+		<script>
+			/**
+			 * maximum distance between the end of 1 action and the beginning of another
+			 * (in order for them to be considered part of the same set)
+			 */
+			const tapGapCap = 400;
+
+			/**
+			 * maximum amount the finger can move before the action is no longer considered a tap
+			 */
+			const tapCap = 10;
+
+			const curveHeightThreshold = 6;
+			const curvePercentThreshold = 0.6;
+
+			const now = () => new Date().getTime();
+
+			const actionSetMatchers = [
+				["👍", [[["up"]]]], // up
+				["❤️", [[["tap", "tap"]], [["up"], ["up"]]]], // double-tap OR 2-finger up
+				["😂", [[["tap", "tap", "tap"]], [["smile"], ["smile"]]]], // triple-tap OR 2-finger smile
+				["😊", [[["smile"]]]], // smile
+				["😢", [[["frown"]]]], // frown
+				["😡", [[["down"]], [["frown"], ["frown"]]]], // down swipe OR 2-finger frown
+			];
+
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			//           action
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			class Action {
+				constructor(id, x, y) {
+					const startPoint = new NPoint(x, y);
+					this.id = id;
+					this.startPoint = startPoint;
+					this.startTime = now();
+					this.endTime = undefined;
+					this.endPoint = undefined;
+					this.ended = false;
+					this.points = []; // [NPoint]
+				}
+			}
+
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			//         action set
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			class ActionSet {
+				constructor(terminationCallback) {
+					this.startTime = now();
+					this.actionChains = new Map(); // touchId : [Action]
+
+					this.activeChains = new Set();
+
+					this.terminationTimer = null;
+
+					this.terminationCallback = terminationCallback;
+				}
+
+				endAction(touchId, x, y) {
+					const actionChain = this.actionChains.get(touchId);
+
+					if (actionChain !== null && actionChain.length > 0) {
+						const lastAction = actionChain[actionChain.length - 1];
+						lastAction.ended = true;
+						lastAction.endTime = now();
+						lastAction.endPoint = lastAction.points[lastAction.points.length - 1];
+						// lastAction.points.push(lastAction.endPoint);
+					}
+
+					this.activeChains.delete(touchId);
+
+					// there are no more active chains; start a countdown to terminate this ActionSet
+					if (this.activeChains.size === 0) {
+						this.terminationTimer = setTimeout(this.terminate.bind(this), tapGapCap);
+					}
+				}
+
+				terminate() {
+					this.terminationCallback(this);
+				}
+
+				updateAction(touchId, x, y) {
+					if (this.terminationTimer !== null) {
+						clearTimeout(this.terminationTimer);
+						this.terminationTimer = null;
+					}
+
+					let actionChain = this.actionChains.get(touchId);
+					let needNewAction = false;
+
+					if (actionChain === undefined) {
+						// create new action chain
+						actionChain = [];
+						this.actionChains.set(touchId, actionChain);
+						needNewAction = true;
+					} else {
+						// check if new data can be attributed to existing action in chain
+						const lastAction = actionChain[actionChain.length - 1];
+
+						// if the previous action hasn't ended yet, attach the new data to it
+						if (lastAction.ended) {
+							needNewAction = true;
+						} else {
+							lastAction.points.push(new NPoint(x, y));
+						}
+					}
+
+					// create new action if needed
+					if (needNewAction) {
+						actionChain.push(new Action(touchId, x, y));
+					}
+					this.activeChains.add(touchId);
+				}
+			}
+
+			const outDiv = document.getElementById("output");
+
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			//          handling
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			const handleActionSet = (actionSet) => {
+				outDiv.innerText = "";
+				console.log("new set");
+				const chains = Array(...actionSet.actionChains.entries()).map(([id, chain]) =>
+					chain.map((action) => handleAction(action))
+				);
+				console.log(chains);
+				// console.log(chains);
+				// for (touchId of actionSet.actionChains.keys()) {
+				// 	for (action of actionSet.actionChains.get(touchId)) {
+				// 		const result = handleAction(action);
+				// 		console.log(touchId, result);
+				// 		outDiv.append(`${'ABCDEFGHIJKLMNOP'.charAt(touchId)} – ${result}`);
+				// 		outDiv.append(document.createElement("br"));
+				// 	}
+				// }
+
+				// do matches
+				for (const [emotion, matchers] of actionSetMatchers) {
+					// console.log(emotion);
+					for (const matcherChains of matchers) {
+						// console.log(matcherChains);
+						const neededChains = Array(...matcherChains);
+
+						let matcherSucceeded = true;
+						for (const chain of chains) {
+							// has this chain been matched to a neededChain
+							let chainMatched = false;
+							for (let i = neededChains.length - 1; i >= 0; i--) {
+								const neededChain = neededChains[i];
+								if (neededChain.length !== chain.length) {
+									continue;
+								}
+
+								// does this chain match internally to the current neededChain
+								let chainMatches = true;
+								for (let j = 0; j < chain.length; j++) {
+									if (neededChain[j] !== chain[j]) {
+										chainMatches = false;
+										break;
+									}
+								}
+
+								// check if chain matches
+								if (chainMatches) {
+									neededChains.pop(i);
+									chainMatched = true;
+									break;
+								}
+							}
+							// one of the chains does not exist in the matcher, so terminate
+							if (!chainMatched) {
+								matcherSucceeded = false;
+								break;
+							}
+						}
+						matcherSucceeded &&= neededChains.length === 0;
+
+						if (matcherSucceeded) {
+							return emotion;
+						}
+					}
+				}
+
+				return null;
+			};
+
+			// given an Action, determine if swipe or tap
+			const handleAction = (action) => {
+				let distance = 0;
+				const points = action.points;
+				for (let i = 1; i < points.length; i++) {
+					distance += NPoint.dist(points[i - 1], points[i]);
+				}
+				if (distance < tapCap) {
+					return "tap";
+				} else {
+					return handleSwipe(action);
+				}
+			};
+
+			// given a swipe, figure out what shape it is
+			const handleSwipe = (swipe) => {
+				// swipe: action
+				// U: happy ; n: sad
+
+				let numberAboveStart = 0; // >0 = things above start, <0 = things below start
+				let numberAboveEnd = 0; // >0 = things above end, <0 = things below end
+
+				const sy = swipe.startPoint.y;
+				const ey = swipe.endPoint.y;
+				const pointCount = swipe.points.length;
+				const halfPointCount = Math.round(pointCount / 2);
+
+				for (let i = 0; i < halfPointCount; i++) {
+					const y = swipe.points[i].y;
+					if (y - curveHeightThreshold > sy) {
+						numberAboveStart++;
+					} else if (y + curveHeightThreshold < sy) {
+						numberAboveStart--;
+					}
+				}
+
+				for (let i = halfPointCount; i < pointCount; i++) {
+					const y = swipe.points[i].y;
+					if (y - curveHeightThreshold > ey) {
+						numberAboveEnd++;
+					} else if (y + curveHeightThreshold < ey) {
+						numberAboveEnd--;
+					}
+				}
+
+				const startPercentage = numberAboveStart / halfPointCount;
+				const endPercentage = numberAboveEnd / halfPointCount;
+
+				if (startPercentage > curvePercentThreshold && endPercentage > curvePercentThreshold) {
+					return "smile";
+				} else if (startPercentage < -curvePercentThreshold && endPercentage < -curvePercentThreshold) {
+					return "frown";
+				}
+
+				// console.log(swipe.startPoint.y, swipe.endPoint.y, maxY);
+				// if (
+				// 	maxY - curveThreshold > swipe.endPoint.y &&
+				// 	maxY - curveThreshold > swipe.startPoint.y &&
+				// 	Math.abs(Math.max(swipe.endPoint.y, swipe.startPoint.y) - maxY) < 10
+				// ) {
+				// 	return "smile";
+				// }
+
+				// if (
+				// 	minY + curveThreshold < swipe.endPoint.y &&
+				// 	minY + curveThreshold < swipe.startPoint.y &&
+				// 	Math.abs(Math.min(swipe.endPoint.y, swipe.startPoint.y) - minY) < 10
+				// ) {
+				// 	return "frown";
+				// }
+
+				// up: thumbs up ; down: angry
+				let diffX = 0;
+				let diffY = 0;
+				const points = swipe.points;
+				for (let i = 1; i < points.length; i++) {
+					diffX += points[i - 1].x - points[i].x;
+					diffY += points[i - 1].y - points[i].y;
+				}
+
+				const xMag = Math.abs(diffX);
+				const yMag = Math.abs(diffY);
+				if (xMag > 2 * yMag) {
+					if (diffX > 0) {
+						return "left";
+					} else {
+						return "right";
+					}
+				} else if (yMag > 2 * xMag) {
+					if (diffY > 0) {
+						return "up";
+					} else {
+						return "down";
+					}
+				}
+
+				return "nothing";
+			};
+
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			//           events
+			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			let currentActionSet = null;
+			document.addEventListener("touchstart", (e) => {
+				output.innerText = "";
+				for (let i = 0; i < e.changedTouches.length; i++) {
+					const touch = e.changedTouches[i];
+					let touchId = touch.identifier;
+
+					if (currentActionSet === null) {
+						currentActionSet = new ActionSet((actionSet) => {
+							const result = handleActionSet(actionSet);
+							console.log(result);
+							outDiv.innerText = result ?? "?";
+							currentActionSet = null;
+						});
+					}
+
+					currentActionSet.updateAction(touchId, touch.clientX, touch.clientY);
+				}
+			});
+
+			document.addEventListener("touchmove", (e) => {
+				for (let i = 0; i < e.changedTouches.length; i++) {
+					const touch = e.changedTouches[i];
+					let touchId = touch.identifier;
+
+					currentActionSet.updateAction(touchId, touch.clientX, touch.clientY);
+				}
+			});
+
+			document.addEventListener("touchend", (e) => {
+				for (let i = 0; i < e.changedTouches.length; i++) {
+					const touch = e.changedTouches[i];
+					let touchId = touch.identifier;
+
+					currentActionSet.endAction(touchId, touch.clientX, touch.clientY);
+				}
+			});
+		</script>
+	</body>
+</html>
