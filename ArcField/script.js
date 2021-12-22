@@ -1,3 +1,15 @@
+if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+  let result = confirm("ArcField is (most likely) not compatible with your device. Running it may cause device-wide GLITCHES and FLASHING LIGHTS. Proceed anyway?");
+  if(!result){
+    window.close();
+  }else{
+    result = confirm("Are you really sure you want to run ArcField on your incompatible device?");
+    if(!result){
+      window.close();
+    }
+  }
+}
+
 const gpu = new GPU();
 
 const canvasParent = document.getElementById('canvas-parent');
